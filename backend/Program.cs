@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -8,13 +12,25 @@ builder.Services.AddSwaggerGen();
 // Add CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin()  // Allow all origins
+    options.AddPolicy("AllowSpecificOrigin",
+        builder => builder.WithOrigins("http://localhost:3000")  // Allow specific origin
             .AllowAnyMethod()
-            .AllowAnyHeader());
+            .AllowAnyHeader()
+            .AllowCredentials());  // Allow credentials
 });
 
+//setup authentication
+builder.Services.AddDbContext<ApplicationDbContext>(
+    options => options.UseInMemoryDatabase("AppDb"));
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>();
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -23,37 +39,53 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// mapping identity endpoints (for authentication)
+app.MapIdentityApi<IdentityUser>();
+
 app.UseHttpsRedirection();
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigin");
 
 var users = new List<StandardUser>();
 
-var user = new StandardUser("test", "test", "test", "test", "test");
+var user = new StandardUser("test", "test", "test", "test");
 users.Add(user);
 
-app.MapGet("/users", () => 
+app.MapGet("/profile", async (ApplicationDbContext context, HttpContext httpContext) =>
 {
-    return Results.Ok(users);
-})
-.WithName("GetUsers")
-.WithOpenApi();
-
-app.MapPost("/register", (userDto user) => 
-{
-    var newUser = new StandardUser(user.UserName, user.Email, user.Password, user.FirstName, user.LastName);
-    users.Add(newUser);
-    return Results.Ok(newUser);
-}).WithOpenApi();
-
-app.MapPost("/login", (LoginCredentials credentials) => 
-{
-    //TODO add session tokens
-    var foundUser = users.FirstOrDefault(u => u.Email == credentials.Email && u.Password == credentials.Password);
-    if (foundUser == null)
+    //find the email of the logged in user
+    var user = httpContext.User.Identity?.Name;
+    
+     if(user == null)
     {
         return Results.NotFound();
+    } 
+
+    //return the user object
+    var selectedUser = users.FirstOrDefault(u => u.Email == user);
+    return Results.Ok(selectedUser);
+})
+.WithOpenApi()
+.RequireAuthorization();
+
+// Add a new user using identity and to the list of users
+app.MapPost("/add_user", async (UserManager<IdentityUser> userManager, userDto model) =>
+{
+    var credentials = new IdentityUser
+    {
+        UserName = model.Email,
+        Email = model.Email
+    };
+
+    var result = await userManager.CreateAsync(credentials, model.Password);
+
+    if (result.Succeeded)
+    {
+        var user = new StandardUser(model.UserName, model.Email, model.FirstName, model.LastName);
+        users.Add(user);
+        return Results.Ok("User registered successfully");
     }
-    return Results.Ok(foundUser);
-}).WithOpenApi();
+
+    return Results.BadRequest(result.Errors);
+});
 
 app.Run();

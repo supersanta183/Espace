@@ -1,9 +1,10 @@
+using Microsoft.AspNetCore.Identity;
+
 public interface IUser
 {
     Guid Id { get; set; }
     String UserName { get; set; }
     String Email { get; set; }
-    String Password { get; set; }
     String Role { get; set; }
     String FirstName { get; set; }
     String LastName { get; set; }

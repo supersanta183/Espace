@@ -4,6 +4,12 @@ import { useState, useEffect } from "react";
 
 import IStandardUser from "@/interfaces/IStandardUser";
 
+interface ICredentials {
+  UserName: string,
+  Email: string,
+  Password: string
+}
+
 const page = () => {
   const [username, setUsername] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -23,14 +29,22 @@ const page = () => {
       return;
     }
     const user: IStandardUser = {
-      Username: username,
-      Email: email,
-      Password: password,
-      FirstName: firstName,
-      LastName: lastName,
+      username: username,
+      email: email,
+      password: password,
+      firstName: firstName,
+      lastName: lastName,
     };
+
+
+    const credentials: ICredentials = {
+      UserName: username,
+      Email: email,
+      Password: password
+    }
+
     try {
-      const response = await fetch("http://localhost:5064/register", {
+      const response = await fetch("http://localhost:5064/add_user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
