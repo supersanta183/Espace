@@ -1,7 +1,12 @@
+"use client";
 import Link from "next/link";
 import React from "react";
 
+import { useLoggedInContext } from "@/Contexts/LoggedInProvider";
+import Logout from "./Logout";
+
 const Navbar = () => {
+  const { loggedIn, setLoggedIn } = useLoggedInContext();
   return (
     <div className="navbar bg-base-100">
       <div className="navbar-start">
@@ -32,6 +37,9 @@ const Navbar = () => {
             <li>
               <Link href="/login">Login</Link>
             </li>
+            <li>
+              <Link href="/profile">Profile</Link>
+            </li>
           </ul>
         </div>
         <Link href="/" className="btn btn-ghost text-xl">
@@ -46,11 +54,22 @@ const Navbar = () => {
             </Link>
           </li>
           <li>
-            <Link href="/login" className="btn btn-ghost">Login</Link>
+            <Link href="/profile" className="btn btn-ghost">
+              Profile
+            </Link>
           </li>
         </ul>
       </div>
-      <div className="navbar-end"></div>
+      <div className="navbar-end">
+          { !loggedIn &&
+            <Link href="/login" className="btn btn-ghost">
+              Login
+            </Link>
+          }
+          { loggedIn &&
+            <Logout />
+          }
+      </div>
     </div>
   );
 };

@@ -1,14 +1,18 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import ILoginCredentials from "@/interfaces/ILoginCredentials";
-import { useRouter } from "next/navigation";
+import { useLoggedInContext } from "@/Contexts/LoggedInProvider";
+import Logout from "@/components/Logout";
+import { refresh_localstorage } from "@/helperFunctions/helpers";
 
 const page = () => {
   const Router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const { loggedIn, setLoggedIn } = useLoggedInContext();
 
   const submitLogin = async () => {
     if (email === "" || password === "") {
@@ -30,9 +34,9 @@ const page = () => {
         body: JSON.stringify(credentials),
       });
       const result = await response.json();
-      let accessToken = result.accessToken;
-      let refreshToken = result.refreshToken;
-      saveTokens(accessToken, refreshToken);
+      refresh_localstorage(result);
+
+      setLoggedIn(true);
 
       Router.push("/profile");
       console.log("user logged in successfully", result);
@@ -41,10 +45,18 @@ const page = () => {
     }
   };
 
-  const saveTokens = (accessToken: string, refreshToken: string) => {
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-  };
+  if (loggedIn) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="card bg-base-100 w-96 shadow-xl">
+          <div className="card-body items-center">
+            <h2 className="card-title text-center">You are already logged in</h2>
+            <Logout />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full items-center justify-center">

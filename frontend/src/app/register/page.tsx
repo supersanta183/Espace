@@ -3,6 +3,8 @@ import React from "react";
 import { useState, useEffect } from "react";
 
 import IStandardUser from "@/interfaces/IStandardUser";
+import { useLoggedInContext } from "@/Contexts/LoggedInProvider";
+import Logout from "@/components/Logout";
 
 interface ICredentials {
   UserName: string,
@@ -16,6 +18,7 @@ const page = () => {
   const [password, setPassword] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const {loggedIn} = useLoggedInContext();
 
   const submitUser = async () => {
     if (
@@ -57,6 +60,19 @@ const page = () => {
       console.error("Error:", error);
     }
   };
+
+  if (loggedIn) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <div className="card bg-base-100 w-96 shadow-xl">
+          <div className="card-body items-center">
+            <h2 className="card-title text-center">You are already logged in</h2>
+            <Logout />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-full w-full items-center justify-center">

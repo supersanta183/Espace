@@ -88,4 +88,17 @@ app.MapPost("/add_user", async (UserManager<IdentityUser> userManager, userDto m
     return Results.BadRequest(result.Errors);
 });
 
+app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
+    [FromBody] object empty) =>
+{
+    if (empty != null)
+    {
+        await signInManager.SignOutAsync();
+        return Results.Ok();
+    }
+    return Results.Unauthorized();
+})
+.WithOpenApi()
+.RequireAuthorization();
+
 app.Run();
