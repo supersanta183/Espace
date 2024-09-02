@@ -58,7 +58,7 @@ app.MapGet("/profile", async (ApplicationDbContext context, HttpContext httpCont
      if(user == null)
     {
         return Results.NotFound();
-    } 
+    }
 
     //return the user object
     var selectedUser = users.FirstOrDefault(u => u.Email == user);

@@ -1,46 +1,50 @@
-'use client'
+"use client";
 import React from "react";
 import { useState } from "react";
 
 import ILoginCredentials from "@/interfaces/ILoginCredentials";
+import { useRouter } from "next/navigation";
 
 const page = () => {
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+  const Router = useRouter();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
-    const submitLogin = async () => {
-        if (email === "" || password === "") {
-            alert("Please fill out all fields");
-            return;
-        }
-
-        const credentials: ILoginCredentials = {
-            Email: email,
-            Password: password,
-        };
-
-        try {
-            const response = await fetch("http://localhost:5064/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(credentials),
-            });
-            const result = await response.json();
-            let accessToken = result.accessToken;
-            let refreshToken = result.refreshToken;
-            saveTokens(accessToken, refreshToken);
-            console.log("user logged in successfully", result);
-        } catch (error) {
-            console.error("Error:", error);
-        }
+  const submitLogin = async () => {
+    if (email === "" || password === "") {
+      alert("Please fill out all fields");
+      return;
     }
 
-    const saveTokens = (accessToken: string, refreshToken: string) => {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
+    const credentials: ILoginCredentials = {
+      Email: email,
+      Password: password,
+    };
+
+    try {
+      const response = await fetch("http://localhost:5064/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+      const result = await response.json();
+      let accessToken = result.accessToken;
+      let refreshToken = result.refreshToken;
+      saveTokens(accessToken, refreshToken);
+
+      Router.push("/profile");
+      console.log("user logged in successfully", result);
+    } catch (error) {
+      console.error("Error:", error);
     }
+  };
+
+  const saveTokens = (accessToken: string, refreshToken: string) => {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
+  };
 
   return (
     <div className="flex h-full w-full items-center justify-center">
