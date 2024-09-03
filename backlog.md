@@ -1,3 +1,4 @@
+## Planned features
 - delete posts
 - edit posts
 - pageination of posts
@@ -14,7 +15,7 @@
 - notifications when friends make a post
 - sqlite database
 - highlight the tab you are currently in
-
-
 - refactor c# program.cs file
 - support of profile image
+
+## Finished features
