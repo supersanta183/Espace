@@ -6,29 +6,15 @@ import axios from "axios";
 
 import OwnPost from "./OwnPost";
 
-const ProfileFeed = () => {
-  const [posts, setPosts] = useState<IPost[]>([]);
+interface Props {
+  fetchPosts: () => void;
+  posts: IPost[];
+}
 
+const ProfileFeed: React.FC<Props> = ({fetchPosts, posts}) => {
   useEffect(() => {
     fetchPosts();
   }, []);
-
-  const fetchPosts = async () => {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-
-      const res = await axios.get("http://localhost:5064/my_posts", {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      setPosts(res.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   return (
     <div>

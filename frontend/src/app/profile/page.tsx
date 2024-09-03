@@ -1,15 +1,18 @@
 "use client";
 import React from "react";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 import IStandardUser from "@/interfaces/IStandardUser";
 import { useLoggedInContext } from "@/Contexts/LoggedInProvider";
 import { check_expired_access_token } from "@/helperFunctions/helpers";
 import PostInput from "./PostInput";
 import ProfileFeed from "./ProfileFeed";
+import { IPost } from "@/interfaces/IPost";
 
 const page = () => {
   const [user, setUser] = useState<IStandardUser | null>(null);
+  const [posts, setPosts] = useState<IPost[]>([])
   const { loggedIn, setLoggedIn } = useLoggedInContext();
 
   useEffect(() => {
@@ -40,6 +43,23 @@ const page = () => {
     }
   };
 
+  const fetchPosts = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+
+      const res = await axios.get("http://localhost:5064/my_posts", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      setPosts(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   if (!loggedIn || !user) {
     return (
       <div className=" flex items-center justify-center h-full w-full">
@@ -67,12 +87,12 @@ const page = () => {
         </div>
       </div>
       <div className="">
-        <PostInput />
+        <PostInput fetchPosts={fetchPosts} />
       </div>
       <div className="flex">
         <div className="w-1/4"></div>
         <div className="w-full">
-          <ProfileFeed />
+          <ProfileFeed fetchPosts={fetchPosts} posts={posts} />
         </div>
       </div>
     </div>

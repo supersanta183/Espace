@@ -3,7 +3,11 @@ import IPostDto, { IPost } from "@/interfaces/IPost";
 import React from "react";
 import { useState, useEffect } from "react";
 
-const PostInput = () => {
+interface Props {
+  fetchPosts: () => void;
+}
+
+const PostInput: React.FC<Props> = ({fetchPosts}) => {
   const [post, setPost] = useState<string>("");
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -41,6 +45,7 @@ const PostInput = () => {
 
       const result: IPost = await response.json();
       console.log("post added successfully", result);
+      fetchPosts();
     } catch (error) {
       console.error("Error:", error);
     }
