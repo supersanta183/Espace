@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -45,7 +46,9 @@ app.MapIdentityApi<IdentityUser>();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 
+var utils = new Utils();
 var users = new List<StandardUser>();
+var posts = new List<Post>();
 
 var user = new StandardUser("test", "test", "test", "test");
 users.Add(user);
@@ -53,7 +56,7 @@ users.Add(user);
 app.MapGet("/profile", async (ApplicationDbContext context, HttpContext httpContext) =>
 {
     //find the email of the logged in user
-    var user = httpContext.User.Identity?.Name;
+    var user = utils.GetAuthorizedEmail(httpContext);
     
      if(user == null)
     {
@@ -100,5 +103,35 @@ app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
 })
 .WithOpenApi()
 .RequireAuthorization();
+
+app.MapPost("/new_post", (PostDto content, HttpContext httpContext) => 
+{
+    var email = utils.GetAuthorizedEmail(httpContext);
+    if(email == null)
+    {
+        return Results.NotFound("invalid authorizing email");
+    }
+    var post = new Post(content.Content, email);
+    posts.Add(post);
+    return Results.Ok(post);
+})
+.WithOpenApi()
+.RequireAuthorization();
+
+app.MapGet("/my_posts", (HttpContext httpContext) => 
+{
+    var email = utils.GetAuthorizedEmail(httpContext);
+    Console.WriteLine("email" + email);
+    if(email == null)
+    {
+        return Results.NotFound("invalid authorizing email");
+    }
+    var myPosts = posts.Where(p => p.Poster.Equals(email)).ToList();
+    if(myPosts == null) 
+    {
+        return Results.NotFound("No posts associated with user");
+    }
+    return Results.Ok(myPosts);
+});
 
 app.Run();
