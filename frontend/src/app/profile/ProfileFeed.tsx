@@ -7,15 +7,10 @@ import axios from "axios";
 import OwnPost from "./OwnPost";
 
 interface Props {
-  fetchPosts: () => void;
   posts: IPost[];
 }
 
-const ProfileFeed: React.FC<Props> = ({fetchPosts, posts}) => {
-  useEffect(() => {
-    fetchPosts();
-  }, []);
-
+const ProfileFeed: React.FC<Props> = ({posts}) => {
   return (
     <div>
       {posts.length > 0 ? (

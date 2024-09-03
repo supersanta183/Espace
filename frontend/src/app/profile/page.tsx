@@ -18,6 +18,7 @@ const page = () => {
   useEffect(() => {
     check_expired_access_token(setLoggedIn);
     getUser();
+    fetchPosts();
   }, []);
 
   const getUser = async () => {
@@ -53,8 +54,8 @@ const page = () => {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      setPosts(res.data);
+      const myPosts: IPost[] = res.data;
+      setPosts(myPosts.reverse());
     } catch (error) {
       console.log(error);
     }
@@ -92,7 +93,7 @@ const page = () => {
       <div className="flex">
         <div className="w-1/4"></div>
         <div className="w-full">
-          <ProfileFeed fetchPosts={fetchPosts} posts={posts} />
+          <ProfileFeed posts={posts} />
         </div>
       </div>
     </div>
