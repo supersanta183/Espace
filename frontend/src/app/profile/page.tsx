@@ -6,13 +6,13 @@ import IStandardUser from "@/interfaces/IStandardUser";
 import { useLoggedInContext } from "@/Contexts/LoggedInProvider";
 import { check_expired_access_token } from "@/helperFunctions/helpers";
 import PostInput from "./PostInput";
+import ProfileFeed from "./ProfileFeed";
 
 const page = () => {
   const [user, setUser] = useState<IStandardUser | null>(null);
   const { loggedIn, setLoggedIn } = useLoggedInContext();
 
   useEffect(() => {
-    console.log(loggedIn);
     check_expired_access_token(setLoggedIn);
     getUser();
   }, []);
@@ -68,6 +68,12 @@ const page = () => {
       </div>
       <div className="">
         <PostInput />
+      </div>
+      <div className="flex">
+        <div className="w-1/4"></div>
+        <div className="w-full">
+          <ProfileFeed />
+        </div>
       </div>
     </div>
   );

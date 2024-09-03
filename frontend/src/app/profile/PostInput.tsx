@@ -1,20 +1,51 @@
-'use client'
+"use client";
+import IPostDto, { IPost } from "@/interfaces/IPost";
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const PostInput = () => {
-    const [post, setPost] = useState<string>("");
+  const [post, setPost] = useState<string>("");
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if(e.key === "Enter" && e.shiftKey) {
-            return;
-        }
-        if(e.key === "Enter") {
-            e.preventDefault();
-            // TODO open modal to confirm posting
-            return;
-        }
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && e.shiftKey) {
+      return;
     }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      // TODO open modal to confirm posting
+      submitPost();
+      return;
+    }
+  };
+
+  const submitPost = async () => {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+      if(!accessToken){
+        console.log("invalid access token");
+        return;
+      }
+
+      let newPost : IPostDto = {
+        Content: post,
+      } 
+
+      const response = await fetch("http://localhost:5064/new_post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(newPost),
+      });
+
+      const result: IPost = await response.json();
+      console.log("post added successfully", result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <textarea
