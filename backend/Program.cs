@@ -53,6 +53,7 @@ var posts = new List<Post>();
 var user = new StandardUser("test", "test", "test", "test");
 users.Add(user);
 
+//get user profile associated with the credentials
 app.MapGet("/profile", async (ApplicationDbContext context, HttpContext httpContext) =>
 {
     //find the email of the logged in user
@@ -91,6 +92,8 @@ app.MapPost("/add_user", async (UserManager<IdentityUser> userManager, userDto m
     return Results.BadRequest(result.Errors);
 });
 
+
+//logout
 app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
     [FromBody] object empty) =>
 {
@@ -104,6 +107,8 @@ app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
 .WithOpenApi()
 .RequireAuthorization();
 
+
+//add a new post on own profile
 app.MapPost("/new_post", (PostDto content, HttpContext httpContext) => 
 {
     var email = utils.GetAuthorizedEmail(httpContext);
@@ -118,6 +123,7 @@ app.MapPost("/new_post", (PostDto content, HttpContext httpContext) =>
 .WithOpenApi()
 .RequireAuthorization();
 
+//get all posts on own profile
 app.MapGet("/my_posts", (HttpContext httpContext) => 
 {
     var email = utils.GetAuthorizedEmail(httpContext);
