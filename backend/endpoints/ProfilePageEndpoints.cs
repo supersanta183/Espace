@@ -1,3 +1,11 @@
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
 public static class ProfilePageEndpoints
 {
     public static void MapProfilePageEndpoints(this IEndpointRouteBuilder app, List<StandardUser> users, List<Post> posts, Utils utils)
