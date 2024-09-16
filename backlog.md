@@ -1,4 +1,5 @@
 ## Planned features
+- need feedback when registering user and logging in/logging out
 - delete posts
 - edit posts
 - pageination of posts
