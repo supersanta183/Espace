@@ -33,13 +33,15 @@ const page = () => {
         },
         body: JSON.stringify(credentials),
       });
-      const result = await response.json();
-      refresh_localstorage(result);
-
-      setLoggedIn(true);
-
-      Router.push("/profile");
-      console.log("user logged in successfully", result);
+      if(response.ok){
+        const result = await response.json();
+        refresh_localstorage(result);
+  
+        setLoggedIn(true);
+  
+        Router.push("/profile");
+        console.log("user logged in successfully", result);
+      }
     } catch (error) {
       console.error("Error:", error);
     }

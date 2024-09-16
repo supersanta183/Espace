@@ -11,6 +11,11 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
      protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        // Ensure the Discriminator column is included
+        builder.Entity<IdentityUser>()
+            .HasDiscriminator<string>("Discriminator")
+            .HasValue<IdentityUser>("IdentityUser");
     }
 
 }

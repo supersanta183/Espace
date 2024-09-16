@@ -42,9 +42,11 @@ const PostInput: React.FC<Props> = ({fetchPosts}) => {
         },
         body: JSON.stringify(newPost),
       });
+      if (response.ok){
+        const result: IPost = await response.json();
+        console.log("post added successfully", result);
+      }
 
-      const result: IPost = await response.json();
-      console.log("post added successfully", result);
       fetchPosts();
     } catch (error) {
       console.error("Error:", error);

@@ -5,7 +5,7 @@ import axios from "axios";
 
 import IStandardUser from "@/interfaces/IStandardUser";
 import { useLoggedInContext } from "@/Contexts/LoggedInProvider";
-import { check_expired_access_token } from "@/helperFunctions/helpers";
+import { check_expired_access_token, update_access_token } from "@/helperFunctions/helpers";
 import PostInput from "./PostInput";
 import ProfileFeed from "./ProfileFeed";
 import { IPost } from "@/interfaces/IPost";
@@ -21,6 +21,10 @@ const page = () => {
     fetchPosts();
   }, []);
 
+  useEffect(() => {
+    console.log("user change ", user);
+  }, [user]);
+
   const getUser = async () => {
     try {
       let accessToken = localStorage.getItem("accessToken");
@@ -29,15 +33,16 @@ const page = () => {
         return;
       }
 
-      const response = await fetch("http://localhost:5064/profile", {
+      const response = await axios.get("http://localhost:5064/profile", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        credentials: "include",
       });
-      const result = await response.json();
+      console.log("response ", response.status)
+      const result = response.data;
+      console.log(result);
       setUser(result);
     } catch (error) {
       console.error("Error:", error);

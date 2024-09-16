@@ -24,7 +24,7 @@ export const update_access_token = async () => {
             return;
         }
     
-        const response = await fetch("http://localhost:5064/login", {
+        const response = await fetch("http://localhost:5064/refresh", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

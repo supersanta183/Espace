@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +19,12 @@ public static class UserAuthenticationEndpoints
 
             if (result.Succeeded)
             {
+                await userManager.AddClaimAsync(credentials, new Claim(ClaimTypes.Name, model.UserName));
+                await userManager.AddClaimAsync(credentials, new Claim(ClaimTypes.Email, model.Email));
+                
                 var user = new StandardUser(model.UserName, model.Email, model.FirstName, model.LastName);
                 users.Add(user);
+
                 return Results.Ok("User registered successfully");
             }
 
@@ -38,6 +43,5 @@ public static class UserAuthenticationEndpoints
         })
         .WithOpenApi()
         .RequireAuthorization();
-
     }
 }

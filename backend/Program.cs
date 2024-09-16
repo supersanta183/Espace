@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -24,9 +25,11 @@ builder.Services.AddCors(options =>
             .AllowCredentials());  // Allow credentials
 });
 
+Env.Load();
 //setup authentication
+var connectionString = Environment.GetEnvironmentVariable("CONNECTIONSTRING");
 builder.Services.AddDbContext<ApplicationDbContext>(
-    options => options.UseInMemoryDatabase("AppDb"));
+    options => options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 30))));
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options =>
 {
