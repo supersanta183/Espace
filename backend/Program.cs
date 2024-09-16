@@ -53,85 +53,10 @@ var posts = new List<Post>();
 var user = new StandardUser("test", "test", "test", "test");
 users.Add(user);
 
-app.MapGet("/profile", async (ApplicationDbContext context, HttpContext httpContext) =>
-{
-    //find the email of the logged in user
-    var user = utils.GetAuthorizedEmail(httpContext);
-    
-     if(user == null)
-    {
-        return Results.NotFound();
-    }
+//map endpoints for user authentication
+app.MapUserAuthenticationEndpoints(users);
 
-    //return the user object
-    var selectedUser = users.FirstOrDefault(u => u.Email == user);
-    return Results.Ok(selectedUser);
-})
-.WithOpenApi()
-.RequireAuthorization();
-
-// Add a new user using identity and to the list of users
-app.MapPost("/add_user", async (UserManager<IdentityUser> userManager, userDto model) =>
-{
-    var credentials = new IdentityUser
-    {
-        UserName = model.Email,
-        Email = model.Email
-    };
-
-    var result = await userManager.CreateAsync(credentials, model.Password);
-
-    if (result.Succeeded)
-    {
-        var user = new StandardUser(model.UserName, model.Email, model.FirstName, model.LastName);
-        users.Add(user);
-        return Results.Ok("User registered successfully");
-    }
-
-    return Results.BadRequest(result.Errors);
-});
-
-app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
-    [FromBody] object empty) =>
-{
-    if (empty != null)
-    {
-        await signInManager.SignOutAsync();
-        return Results.Ok();
-    }
-    return Results.Unauthorized();
-})
-.WithOpenApi()
-.RequireAuthorization();
-
-app.MapPost("/new_post", (PostDto content, HttpContext httpContext) => 
-{
-    var email = utils.GetAuthorizedEmail(httpContext);
-    if(email == null)
-    {
-        return Results.NotFound("invalid authorizing email");
-    }
-    var post = new Post(content.Content, email);
-    posts.Add(post);
-    return Results.Ok(post);
-})
-.WithOpenApi()
-.RequireAuthorization();
-
-app.MapGet("/my_posts", (HttpContext httpContext) => 
-{
-    var email = utils.GetAuthorizedEmail(httpContext);
-    Console.WriteLine("email" + email);
-    if(email == null)
-    {
-        return Results.NotFound("invalid authorizing email");
-    }
-    var myPosts = posts.Where(p => p.Poster.Equals(email)).ToList();
-    if(myPosts == null) 
-    {
-        return Results.NotFound("No posts associated with user");
-    }
-    return Results.Ok(myPosts);
-});
+//maps endpoints that handles actions on the users profile page
+app.MapProfilePageEndpoints(users, posts, utils);
 
 app.Run();

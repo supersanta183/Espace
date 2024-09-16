@@ -47,7 +47,7 @@ const page = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5064/add_user", {
+      const response = await fetch("http://localhost:5064/register_user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
