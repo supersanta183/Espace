@@ -46,6 +46,8 @@ app.MapIdentityApi<IdentityUser>();
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin");
 
+
+//temporary values, will be replaced by a database
 var utils = new Utils();
 var users = new List<StandardUser>();
 var posts = new List<Post>();

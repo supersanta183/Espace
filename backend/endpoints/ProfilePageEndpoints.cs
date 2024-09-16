@@ -36,7 +36,6 @@ public static class ProfilePageEndpoints
         app.MapGet("/my_posts", (HttpContext httpContext) =>
         {
             var email = utils.GetAuthorizedEmail(httpContext);
-            Console.WriteLine("email" + email);
             if (email == null)
             {
                 return Results.NotFound("invalid authorizing email");
